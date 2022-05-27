@@ -33,7 +33,7 @@ const HomePage: NextPage<Props> = ({ pokemons }) => {
 export const getStaticProps: GetStaticProps = async (ctx) => {
 
   const { data }= await pokeApi.get<PokemonListResponse>('/pokemon?limit=493');
-  console.log({ data });
+  //console.log({ data });
   //https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/
   let pokemons: SmallPoke[] = new Array();
   data.results.map((pokemon: SmallPoke, idx: number) => {
