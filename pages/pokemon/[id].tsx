@@ -9,6 +9,7 @@ import { pokeApi } from '../../api';
 import { Layout } from '../../components/layouts'
 import { Pokemon } from '../../interfaces';
 import { getPokemonInfo, localFavorites } from '../../utils';
+import { redirect } from 'next/dist/server/api-utils';
 interface Props {
     pokemon: Pokemon
 }
@@ -108,8 +109,9 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
         paths: pokemon493.map(id => ({
             params: { id }
         })),
-        fallback: false,
+        fallback: 'blocking',
         // significa que si la pag no esta permitida dame un error 404 en caso tal quiera que pase todo pues le pongo la variable "blocking"
+
     }
 }
 
@@ -117,8 +119,24 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const { id } = params as { id: string };
 
+    const pokemon = await getPokemonInfo(id);
+
+    if(!pokemon) {
+        return{
+            redirect: {
+                destination: '/',
+                permanent: false,
+                //si en un futuro existe la pag se puede redirigir en caso tal sea true va a quedar bloqueada para siempre
+            }
+        }
+    }
+
     return {
-        props: {pokemon: await getPokemonInfo(id) },
+        props: {
+            pokemon
+        },
+        revalidate: 86400,
+        //in seconds
     }
 }
 
